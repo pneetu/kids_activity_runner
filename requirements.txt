@@ -28,3 +28,7 @@ feedparser
 streamlit
 qdrant-client
 uvicorn
+fastapi
+uvicorn
+streamlit
+requests
