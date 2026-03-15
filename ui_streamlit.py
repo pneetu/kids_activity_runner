@@ -62,6 +62,25 @@ st.markdown(
         margin-top: 0.4rem;
         margin-bottom: 0.5rem;
       }
+      .activity-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.activity-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #2C2C54;
+    margin-bottom: 4px;
+}
+
+.activity-date {
+    font-size: 12px;
+    color: #666;
+}
     </style>
     """,
     unsafe_allow_html=True,
@@ -139,13 +158,24 @@ with left:
     if not activities:
         st.warning("No activities returned.")
     else:
-        for a in activities:
-            with st.container(border=True):
-                st.markdown(f"**{a.get('title', 'Untitled')}**")
-                if a.get("published"):
-                    st.caption(a["published"])
-                if a.get("url"):
-                    st.link_button("View activity", a["url"])
+       for a in activities:
+
+           title = a.get("title", "Untitled")
+           date = a.get("published", "")
+           url = a.get("url", "")
+
+           st.markdown(
+               f"""
+               <div class="activity-card">
+                   <div class="activity-title">{title}</div>
+                   <div class="activity-date">{date}</div>
+               </div>
+               """,
+               unsafe_allow_html=True,
+            )
+
+           if url:
+               st.link_button("Open Activity", url)
 
 with right:
     st.markdown("<div class='demo-label'>Try one of these:</div>", unsafe_allow_html=True)
