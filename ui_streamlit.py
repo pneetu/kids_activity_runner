@@ -8,10 +8,10 @@ st.set_page_config(page_title="Kids Activity Runner", layout="wide")
 try:
     API_BASE_URL = st.secrets["API_BASE_URL"]
 except Exception:
-   API_BASE_URL = os.getenv(
-    "API_BASE_URL",
-    "https://kids-activity-runner-api1.onrender.com"
-)
+    API_BASE_URL = os.getenv(
+        "API_BASE_URL",
+        "https://kids-activity-runner-api1.onrender.com"
+    )
 
 st.markdown(
     """
@@ -184,50 +184,59 @@ with right:
         question = "What outdoor parks are good for kids nearby?"
     else:
         question = None
-    chat_area = st.container()
+
     st.divider()
+
+    chat_area = st.container()
+
+    with chat_area:
+        for role, msg in st.session_state.chat:
+            avatar = "🧑" if role == "user" else "✨"
+            with st.chat_message(role, avatar=avatar):
+                st.write(msg)
+
+    st.markdown(
+        """
+        <script>
+            const chatMessages = window.parent.document.querySelectorAll('[data-testid="stChatMessage"]');
+            if (chatMessages.length > 0) {
+                chatMessages[chatMessages.length - 1].scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
 
     typed_question = st.chat_input("Ask about kids activities near your area...")
 
     if typed_question:
         question = typed_question
 
-    
-
-    with chat_area:
-         for role, msg in reversed(st.session_state.chat):
-             avatar = "🧑" if role == "user" else "✨"
-             with st.chat_message(role, avatar=avatar):
-                 st.write(msg)
-
     if question:
         question_with_location = f"{question} Default location: {selected_location}."
         st.session_state.chat.append(("user", question))
 
-        with chat_area:
-            with st.chat_message("user", avatar="🧑"):
-                st.write(question)
+        with st.chat_message("assistant", avatar="✨"):
+            with st.spinner("Thinking..."):
+                if mode == "Ask about kids activities (RAG)":
+                    result = ask_activity_rag(question_with_location, top_k=5)
+                    answer = result.get("answer", "")
+                    sources = result.get("sources", [])
 
-            with st.chat_message("assistant", avatar="✨"):
-                with st.spinner("Thinking..."):
-                    if mode == "Ask about kids activities (RAG)":
-                        result = ask_activity_rag(question_with_location, top_k=5)
-                        answer = result.get("answer", "")
-                        sources = result.get("sources", [])
+                    st.write(answer if answer else "I couldn't find relevant activity information.")
 
-                        st.write(answer if answer else "I couldn't find relevant activity information.")
-
-                        if sources:
-                            st.caption("Activity Sources:")
-                            for s in sources[:5]:
-                                with st.container(border=True):
-                                    st.markdown(f"**{s.get('title', 'Untitled')}**")
-                                    if s.get("published"):
-                                        st.caption(s["published"])
-                                    if s.get("url"):
-                                        st.link_button("Open source", s["url"])
-                    else:
-                        answer = ask_general_question(question_with_location)
-                        st.write(answer)
+                    if sources:
+                        st.caption("Activity Sources:")
+                        for s in sources[:5]:
+                            with st.container(border=True):
+                                st.markdown(f"**{s.get('title', 'Untitled')}**")
+                                if s.get("published"):
+                                    st.caption(s["published"])
+                                if s.get("url"):
+                                    st.link_button("Open source", s["url"])
+                else:
+                    answer = ask_general_question(question_with_location)
+                    st.write(answer)
 
         st.session_state.chat.append(("assistant", answer))
+        st.rerun()
