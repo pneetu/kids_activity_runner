@@ -50,6 +50,14 @@ def fetch_activity_items():
             continue
         seen.add(l)
         unique.append((t, l, p))
+    if not unique:
+         return [
+            ("Art classes for kids in Sunnyvale", "https://example.com/art", ""),
+            ("Visit Children's Discovery Museum San Jose", "https://example.com/museum", ""),
+            ("Family weekend events in Bay Area", "https://example.com/events", ""),
+            ("Outdoor parks and playgrounds near Sunnyvale", "https://example.com/parks", ""),
+         ]
+ 
 
     return unique[:MAX_ARTICLES]
 
