@@ -34,8 +34,16 @@ st.markdown(
         background: #B7C9C9;
       }
 
-      [data-testid="stHeader"] {
-        background: transparent !important;
+      [data-testid="stAppViewContainer"] {
+           background: #FFFFFF;
+      }
+      .activity-card {
+          background: #FFFFFF;
+          border-radius: 14px;
+          padding: 14px 16px;
+          margin-bottom: 14px;
+          border: 1px solid #E5E7EB;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       }
 
       h1 { color: #2C2C54 !important; }
@@ -65,13 +73,7 @@ st.markdown(
         margin-top: 0.4rem;
         margin-bottom: 0.5rem;
       }
-      .activity-card {
-    background: white;
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
+      
 
 .activity-title {
     font-weight: 600;
