@@ -27,7 +27,7 @@ st.markdown(
       .viewerBadge_container__1QSob {display:none;}
 
       .block-container {
-        padding-top: 0.8rem !important;
+        padding-top: 2.5rem !important;
       }
       [data-testid="stHeader"] {
         background: white !important;
@@ -54,6 +54,7 @@ st.markdown(
 
       .hero-title {
         text-align: center;
+        margin-top: 1rem;
         margin-bottom: 0.2rem;
       }
 
@@ -130,12 +131,14 @@ def ask_general_question(question: str):
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
-left_header, center_header, right_header = st.columns([1, 5, 1])
+left_header, center_header, right_header = st.columns([1.5, 4.5, 1])
 
 with left_header:
     image_path = os.path.join(os.path.dirname(__file__), "assets", "kiddo.png")
     if os.path.exists(image_path):
-        st.image(image_path, width=220)
+        st.markdown("<div style='padding-left:40px;'>", unsafe_allow_html=True)
+        st.image(image_path, width=180)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 with center_header:
     st.markdown(
