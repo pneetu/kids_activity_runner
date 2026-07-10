@@ -170,7 +170,7 @@ Rules:
                 {
                     "role": "tool",
                     "tool_call_id": tool_call.id,
-                    "content": str(result),
+                    "content": json.dumps(result),
                 }
             )
 
@@ -183,11 +183,21 @@ Rules:
         )
 
     # extract response
-    answer = response.choices[0].message.content or "Sorry, I couldn't generate a response."
+    answer = response.choices[0].message.content or '{"results": []}'
 
     # parse + clean
     try:
         parsed = json.loads(answer)
+        if isinstance(parsed, str):
+         parsed = json.loads(parsed)
+
+        if not isinstance(parsed, dict):
+         parsed = {"results": []}
+
+        results = parsed.get("results", [])
+
+        if not isinstance(results, list):
+         results = []
 
         clean_results = []
 
@@ -201,38 +211,44 @@ Rules:
             "news",
         ]
 
-        for place in parsed.get("results", []):
-            website = place.get("website", "").strip()
+        for place in results:
+            if not isinstance(place, dict):
+                continue
 
-            if website and not website.startswith(("http://", "https://")):
-                website = "https://" + website
+        website = str(place.get("website", "")).strip()
 
-            # remove bad/aggregator links
-            if any(bad in website.lower() for bad in blocked_domains):
-                website = ""
+        if website and not website.startswith(("http://", "https://")):
+            website = "https://" + website
 
-            # validate real sites
-            elif is_valid_website(website):
-                place["website"] = website
-            else:
-                website = ""
-                place["website"] = ""
+        if any(bad in website.lower() for bad in blocked_domains):
+            website = ""
 
-            clean_results.append(place)
+        elif website and is_valid_website(website):
+            pass
 
-        parsed["results"] = clean_results
+        else:
+            website = ""
 
-        return {"answer": parsed}
+        clean_results.append(
+            {
+                "name": str(place.get("name", "Activity")),
+                "website": website,
+                "reason": str(place.get("reason", "")),
+            }
+        )
 
-    except Exception:
+        return {
+        "answer": {
+            "results": clean_results
+        }
+    }
+
+    except (json.JSONDecodeError, TypeError, AttributeError) as error:
+        print(f"Failed to parse OpenAI response: {error}")
+        print(f"Raw response: {answer}")
+
         return {
             "answer": {
-                "results": [
-                    {
-                        "name": "No structured results",
-                        "website": "",
-                        "reason": answer
-                    }
-                ]
-            }
-        }
+                "results": []
+          }
+       }
