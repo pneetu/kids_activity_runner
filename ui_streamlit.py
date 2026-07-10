@@ -29,14 +29,18 @@ st.markdown(
       .block-container {
         padding-top: 0.8rem !important;
       }
-
-      [data-testid="stAppViewContainer"] {
-        background: #B7C9C9;
+      [data-testid="stHeader"] {
+        background: white !important;
+        border-bottom: none;
       }
 
       [data-testid="stAppViewContainer"] {
-           background: #FFFFFF;
+        background: white;
       }
+
+.block-container {
+    padding-top: 0.5rem;
+}
       .activity-card {
           background: #FFFFFF;
           border-radius: 14px;
